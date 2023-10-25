@@ -1,0 +1,52 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '2.7.12'
+	id 'io.spring.dependency-management' version '1.1.0'
+	id 'groovy'
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	sourceCompatibility = '17'
+}
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.liquibase:liquibase-core'
+	compileOnly 'org.projectlombok:lombok'
+	runtimeOnly 'org.postgresql:postgresql'
+	annotationProcessor 'org.projectlombok:lombok'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign:3.1.5'
+	implementation group: 'net.javacrumbs.shedlock', name: 'shedlock-spring', version: '4.44.0'
+	implementation 'net.javacrumbs.shedlock:shedlock-provider-jdbc-template:4.44.0'
+
+	//testing
+	implementation group: 'org.apache.groovy', name: 'groovy', version: '4.0.4'
+	testImplementation group: 'org.spockframework', name: 'spock-spring', version: '2.4-M1-groovy-4.0'
+	implementation 'io.github.benas:random-beans:3.9.0'
+
+	//redis
+	implementation 'org.redisson:redisson:3.20.1'
+
+
+
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
+
