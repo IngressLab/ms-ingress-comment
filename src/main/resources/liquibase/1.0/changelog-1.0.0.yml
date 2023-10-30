@@ -1,0 +1,55 @@
+databaseChangeLog:
+  - changeSet:
+      id: Create comments table
+      author: Agahuseyn Agayev
+      changes:
+        - createTable:
+            tableName: comments
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: bigint
+                  remarks: id of user
+                  constraints:
+                    nullable: false
+              - column:
+                  name: product_id
+                  type: bigint
+                  remarks: id of product
+                  constraints:
+                    nullable: false
+              - column:
+                  name: text
+                  type: text
+                  remarks: text of comment
+                  constraints:
+                    nullable: false
+              - column:
+                  name: status
+                  type: varchar(16)
+                  remarks: status of comment
+                  constraints:
+                  defaultValue: 'ACTIVE'
+              - column:
+                  name: created_at
+                  type: timestamp
+                  defaultValue: now()
+                  remarks: created of comment
+                  constraints:
+                    nullable: false
+              - column:
+                  name: update_at
+                  type: timestamp
+                  defaultValue: now()
+                  remarks: update of comment
+                  constraints:
+                    nullable: false
+
+            remarks: Table to store information about comments of product
