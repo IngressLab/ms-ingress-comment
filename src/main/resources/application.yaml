@@ -1,0 +1,15 @@
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/ms_ingress_comments
+    username: postgres
+    password: 27091995a
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQL10Dialect
+    open-in-view: false
+  liquibase:
+    change-log: classpath:liquibase/changelog-master.yml
+
+
+server:
+  port: 9092
