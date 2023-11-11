@@ -12,7 +12,6 @@ import io.github.benas.randombeans.api.EnhancedRandom
 import spock.lang.Specification
 
 import static com.example.msingresscomment.mapper.CommentMapper.buildCommentEntity
-import static com.example.msingresscomment.mapper.CommentMapper.updateCommentEntity
 
 class CommentServiceTest extends Specification {
     private EnhancedRandom random = EnhancedRandomBuilder.aNewEnhancedRandom()
@@ -68,27 +67,29 @@ class CommentServiceTest extends Specification {
 
     def "TestUpdateComment success"() {
         given:
+        def commentId=random.nextObject(Long)
         def userId = random.nextObject(Long);
         def entity = random.nextObject(CommentEntity)
         def request = random.nextObject(UpdateCommentRequest)
         when:
-        commentService.updateComment(userId, request)
+        commentService.updateComment(commentId,userId,request)
 
         then:
-        1 * commentRepository.findByUserId(userId) >> Optional.of(entity)
-        updateCommentEntity(entity, request)
+        1 * commentRepository.findByIdAndUserId(commentId,userId)>> Optional.of(entity)
+        entity.setText(request.getText())
     }
 
     def "TestUpdateComment error"() {
         given:
+        def commentId=random.nextObject(Long)
         def userId = random.nextObject(Long)
         def request = random.nextObject(UpdateCommentRequest)
 
         when:
-        commentService.updateComment(userId, request)
+        commentService.updateComment(commentId,userId, request)
 
         then:
-        1 * commentRepository.findByUserId(userId) >> Optional.empty()
+        1 * commentRepository.findByIdAndUserId(commentId,userId) >> Optional.empty()
         0 * commentRepository.save(userId)
 
         NotFoundException exception = thrown()
@@ -98,15 +99,16 @@ class CommentServiceTest extends Specification {
     def " TestDeleteComment success"() {
 
         given:
-        def id = random.nextObject(Long)
+        def commentId = random.nextObject(Long)
+        def userId=random.nextObject(Long)
         def entity = random.nextObject(CommentEntity)
 
         when:
-        commentService.deleteComment(id)
+        commentService.deleteComment(commentId,userId)
 
         then:
 
-        1 * commentRepository.findById(id) >> Optional.of(entity)
+        1 * commentRepository.findByIdAndUserId(commentId,userId) >> Optional.of(entity)
         1 * commentRepository.save(entity)
         entity.status == Status.DELETED
     }
@@ -114,15 +116,30 @@ class CommentServiceTest extends Specification {
     def "TestDeleteComment error"() {
 
         given:
-        def id = random.nextObject(Long)
+        def commentId = random.nextObject(Long)
+        def userId = random.nextObject(Long)
 
         when:
-        commentService.deleteComment(id)
+        commentService.deleteComment(commentId,userId)
 
         then:
-        1 * commentRepository.findById(id) >> Optional.empty()
+        1 * commentRepository.findByIdAndUserId(commentId,userId) >> Optional.empty()
         0 * commentRepository.save()
         NotFoundException exception = thrown()
-        exception.message == "PRODUCT_NOT_FOUND"
+        exception.message == "COMMENT_NOT_FOUND"
     }
+
+    def "TestGetCommentsByProduct"(){
+        given:
+        def entity=random.nextObject(CommentEntity)
+        def commentList=[entity]
+        commentRepository.findAll()>>commentList
+
+        when:
+        commentService.getCommentsByProduct()
+
+        then:
+        1*commentRepository.findAll()>>commentList
+    }
+
 }

@@ -1,5 +1,6 @@
 package com.example.msingresscomment.controller
 
+import com.example.msingresscomment.model.constants.HeaderConstants
 import com.example.msingresscomment.model.request.SaveCommentRequest
 import com.example.msingresscomment.model.request.UpdateCommentRequest
 import com.example.msingresscomment.model.response.CommentResponse
@@ -10,8 +11,6 @@ import org.skyscreamer.jsonassert.JSONAssert
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import spock.lang.Specification
-
-import java.time.LocalDateTime
 
 import static org.springframework.http.HttpStatus.*
 import static org.springframework.http.MediaType.APPLICATION_JSON
@@ -64,8 +63,10 @@ class CommentControllerTest extends Specification {
         "userId": 1,
         "productId": 1,
         "text": "Hello world"
+        
         }
-      '''
+        
+       '''
 
         when:
         def result = mockMvc.perform(post(url)
@@ -81,40 +82,59 @@ class CommentControllerTest extends Specification {
 
     def "TestUpdateComment"() {
         given:
+        def commentId = 1L
         def userId = 1L
-        def url = "/v1/comments/$userId"
-        def request = new UpdateCommentRequest(1L, 1L, "Hello world", LocalDateTime.now())
+        def url = "/v1/comments/$commentId"
+        def request = new UpdateCommentRequest(1L, "Hello world")
         def requestBody = '''
        {
          "id": 1,
-         "userId": 1,
-         "text": "Hello world",
+         "text": "Hello world"
+         
         }
+        
          '''
 
         when:
         def result = mockMvc.perform(put(url)
                 .contentType(APPLICATION_JSON)
-                .contentType(requestBody)).andReturn()
+                .header(HeaderConstants.USER_ID, userId.toString())
+                .content(requestBody)).andReturn()
 
         then:
-        1 * commentService.updateComment(userId, requestBody)
+        1 * commentService.updateComment(commentId, userId, request)
         def response = result.response
         response.status == NO_CONTENT.value()
     }
 
     def "TestDeleteComment"() {
         given:
-        def id = 1L
-        def url = "/v1/comments/$id"
+        def commentId = 1L
+        def userId = 1L
+        def url = "/v1/comments/$commentId"
 
         when:
-        def result = mockMvc.perform(delete(url)).andReturn()
+        def result = mockMvc.perform(delete(url)
+                .header(HeaderConstants.USER_ID, userId.toString())).andReturn()
 
         then:
-        1 * commentService.deleteComment(id)
+        1 * commentService.deleteComment(commentId, userId)
         def response = result.response
         response.status == NO_CONTENT.value()
+    }
+
+    def "TestGetComments"() {
+        given:
+        def url = "/v1/comments"
+
+        when:
+        def result = mockMvc.perform(get(url)
+                .contentType(APPLICATION_JSON)).andReturn()
+
+        then:
+        1 * commentService.getCommentsByProduct()
+        def response = result.response
+        response.status == OK.value()
     }
 
 

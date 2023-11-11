@@ -4,7 +4,7 @@ import com.example.msingresscomment.dao.entity.CommentEntity;
 import com.example.msingresscomment.dao.repository.CommentRepository;
 import com.example.msingresscomment.exception.NotFoundException;
 import com.example.msingresscomment.mapper.CommentMapper;
-import com.example.msingresscomment.model.enums.Status;
+import com.example.msingresscomment.model.constants.HeaderConstants;
 import com.example.msingresscomment.model.request.SaveCommentRequest;
 import com.example.msingresscomment.model.request.UpdateCommentRequest;
 import com.example.msingresscomment.model.response.CommentResponse;
@@ -15,7 +15,8 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.example.msingresscomment.mapper.CommentMapper.*;
+import static com.example.msingresscomment.mapper.CommentMapper.buildCommentEntity;
+import static com.example.msingresscomment.mapper.CommentMapper.buildCommentResponse;
 import static com.example.msingresscomment.model.enums.Status.DELETED;
 
 @Service
@@ -38,20 +39,20 @@ public class CommentService {
         log.info("ActionLog.saveComment.end");
     }
 
-    public void updateComment(Long userId, UpdateCommentRequest request) {
-        log.info("ActionLog.updateComment.start userId:{}",userId);
-        var comment = fetchCommentIfExitsByUserId(userId);
-        updateCommentEntity(comment, request);
+    public void updateComment(Long commentId,Long userId, UpdateCommentRequest request) {
+        log.info("ActionLog.updateComment.start userId:{}",commentId);
+        var comment = fetchCommentIfExitsByCommentIdAndUserId(commentId,userId);
+        comment.setText(request.getText());
         commentRepository.save(comment);
-        log.info("ActionLog.updateComment.end userId:{}",userId);
+        log.info("ActionLog.updateComment.end userId:{}",commentId);
     }
 
-    public void deleteComment(Long id) {
-        log.info("ActionLog.deleteComment.start id:{}", id);
-        var comment = fetchCommentIfExits(id);
+    public void deleteComment(Long commentId,Long userId) {
+        log.info("ActionLog.deleteComment.start id:{}", commentId);
+        var comment = fetchCommentIfExitsByCommentIdAndUserId(commentId,userId);
         comment.setStatus(DELETED);
         commentRepository.save(comment);
-        log.info("ActionLog.deleteComment.end id:{}", id);
+        log.info("ActionLog.deleteComment.end id:{}", commentId);
     }
 
     public List<CommentResponse> getCommentsByProduct() {
@@ -69,10 +70,10 @@ public class CommentService {
                 ()->new NotFoundException("COMMENT_NOT_FOUND")
         );
     }
-    private CommentEntity fetchCommentIfExitsByUserId(Long userId){
+    private CommentEntity fetchCommentIfExitsByCommentIdAndUserId(Long commentId,Long userId){
         log.info("ActionLog.fetchCommentIfExitsByUserId.start id:{}", userId);
         log.info("ActionLog.fetchCommentIfExitsByUserId.end id:{}", userId);
-        return commentRepository.findByUserId(userId).orElseThrow(
+        return commentRepository.findByIdAndUserId(commentId,userId).orElseThrow(
                 ()->new NotFoundException("COMMENT_NOT_FOUND")
         );
     }

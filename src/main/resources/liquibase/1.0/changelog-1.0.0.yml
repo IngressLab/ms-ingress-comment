@@ -36,7 +36,7 @@ databaseChangeLog:
                   type: varchar(16)
                   remarks: status of comment
                   constraints:
-                  defaultValue: 'ACTIVE'
+                  defaultValue: ACTIVE
               - column:
                   name: created_at
                   type: timestamp
