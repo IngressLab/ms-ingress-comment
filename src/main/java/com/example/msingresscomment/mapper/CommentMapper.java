@@ -1,6 +1,8 @@
 package com.example.msingresscomment.mapper;
 
 import com.example.msingresscomment.dao.entity.CommentEntity;
+import com.example.msingresscomment.model.constants.HeaderConstants;
+import com.example.msingresscomment.model.enums.Status;
 import com.example.msingresscomment.model.request.SaveCommentRequest;
 import com.example.msingresscomment.model.request.UpdateCommentRequest;
 import com.example.msingresscomment.model.response.CommentResponse;
@@ -20,12 +22,11 @@ public class CommentMapper {
              .userId(request.getUserId())
              .productId(request.getProductId())
              .text(request.getText())
+             .status(Status.ACTIVE)
              .build();
     }
     public static void updateCommentEntity(CommentEntity commentEntity, UpdateCommentRequest commentRequest){
-      commentEntity.setUserId(commentRequest.getUserId());
       commentEntity.setText(commentRequest.getText());
-      commentEntity.setCreatedAt(LocalDateTime.now());
     }
     public static CommentResponse getComments(CommentEntity entity){
       return CommentResponse.builder()

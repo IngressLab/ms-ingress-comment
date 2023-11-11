@@ -11,9 +11,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class UpdateCommentRequest {
     private Long id;
-    private Long userId;
     private String text;
-
-    private LocalDateTime createdAt;
 
 }

@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import static com.example.msingresscomment.model.constants.HeaderConstants.USER_ID;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 
@@ -29,16 +30,17 @@ public class CommentController {
         service.saveComment(request);
     }
 
-    @PutMapping("/{userId}")
+    @PutMapping("/{commentId}")
     @ResponseStatus(NO_CONTENT)
-    public void updateComment(@PathVariable Long userId, @RequestBody UpdateCommentRequest request) {
-        service.updateComment(userId, request);
+    public void updateComment(@PathVariable Long commentId, @RequestHeader(USER_ID) Long userId,
+                              @RequestBody UpdateCommentRequest request) {
+        service.updateComment(commentId, userId, request);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{commentId}")
     @ResponseStatus(NO_CONTENT)
-    public void deleteComment(@PathVariable Long id) {
-        service.deleteComment(id);
+    public void deleteComment(@PathVariable Long commentId, @RequestHeader(USER_ID) Long userId) {
+        service.deleteComment(commentId, userId);
     }
 
     @GetMapping
